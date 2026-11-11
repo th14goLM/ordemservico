@@ -16,11 +16,7 @@ Depois de concluída ou cancelada, a OS não pode mais ser alterada.
 |---|---|
 | Java | 21 |
 | Spring Boot | 4.1.2 |
-| Spring Web MVC | — |
-| Spring Data JPA (Hibernate) | 7.x |
-| MySQL | 8.x |
-| SpringDoc OpenAPI (Swagger UI) | 3.2.0 |
-| Maven (wrapper incluso) | — |
+| MySQL |
 
 ## Arquitetura
 
@@ -138,46 +134,24 @@ Cada regra fica num único método, marcado no código com o comentário `// REG
 
 ### Pré-requisitos
 
-- **JDK 21** (ou 17 ou mais novo)
+- **JDK 21**
 - **MySQL 8** rodando na porta 3306
 
 Não é preciso instalar o Maven, porque o projeto traz o wrapper (`mvnw`).
 
 ### 1. Configurar o banco com o arquivo `.env`
 
-As credenciais do banco não ficam no código. Copie o modelo e preencha a senha:
-
-```bash
-cp .env.example .env
-```
+As senhas do banco não ficam no código. 
 
 ```properties
 DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=ordemservicodb
 DB_USERNAME=root
-DB_PASSWORD=sua_senha
+DB_PASSWORD=senha do banco
 ```
 
-O `.env` está no `.gitignore` e nunca vai para o repositório. O banco `ordemservicodb` e as tabelas são criados automaticamente na primeira execução (`createDatabaseIfNotExist=true` e `ddl-auto=update`).
-
-### 2. Subir a aplicação
-
-Windows (PowerShell):
-
-```powershell
-.\mvnw spring-boot:run
-```
-
-Linux / macOS:
-
-```bash
-./mvnw spring-boot:run
-```
-
-Também dá para rodar pelo VS Code ou pelo IntelliJ, executando a classe `OrdemservicoApplication`. A API sobe em **http://localhost:8080**.
-
-### 3. Documentação interativa (Swagger)
+### 2. Documentação interativa (Swagger)
 
 Acesse **http://localhost:8080/swagger-ui.html** para ver e testar todos os endpoints pelo navegador.
 
@@ -230,11 +204,7 @@ Resposta `201`:
 }
 ```
 
-Nos cadastros (`POST`), não envie o campo `id`: ele é gerado pelo banco, e qualquer valor enviado é ignorado.
-
 ## Roteiro de testes
-
-Faça os testes nesta ordem, com o banco vazio:
 
 | Teste | Requisição | Regra | Resultado esperado |
 |---|---|---|---|
@@ -252,13 +222,8 @@ Faça os testes nesta ordem, com o banco vazio:
 | 10 | `PUT /ordens/{id}/concluir?valor=0` (OS com técnico) | 10 | 400, valor deve ser maior que zero |
 | — | `GET /ordens/prioridade/ALTA` | — | 200, OS de prioridade alta |
 
-Os erros trazem o motivo no campo `message` da resposta.
-
 ## Diferenças em relação ao material de aula
 
-- **Banco de dados:** usa **MySQL** no lugar do PostgreSQL. O código Java é o mesmo; só mudam o driver no `pom.xml` e a URL de conexão.
-- **Credenciais:** saem do arquivo `.env`, importado no `application.properties` com `spring.config.import=optional:file:.env[.properties]`.
-- **Mensagem de erro:** no Spring Boot 4, a propriedade `server.error.include-message` foi substituída por `spring.web.error.include-message`.
-- **Cadastros ignoram o `id` do JSON:** `salvar` e `abrir` zeram o `id` recebido, para o JPA não tentar atualizar um registro inexistente. Ao abrir uma OS, também são descartados `tecnico`, `valor` e `dataFechamento`, para que as Regras 5 e 7 não sejam puladas.
-- **Regra 9:** o `ClienteService` usa o `OrdemServicoRepository`, e não o `OrdemServicoService`, porque o `OrdemServicoService` já depende do `ClienteService` e haveria dependência circular.
-- **Swagger:** documentação interativa com SpringDoc OpenAPI.
+- **Banco de dados:** usei **MySQL** no lugar do PostgreSQL. O código Java é o mesmo, só mudam o driver no `pom.xml` e a URL de conexão.
+- **Senhas:** saem do arquivo `.env`.
+- **Swagger** documentação da api.
